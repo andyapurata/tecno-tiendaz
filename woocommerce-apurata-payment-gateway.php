@@ -20,6 +20,7 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
     function init_wc_apurata_payment_gateway() {
         class WC_Apurata_Payment_Gateway extends WC_Payment_Gateway {
             const TEXT_DOMAIN = 'woocommerce-apurata-payment-gateway';
+            const APURATA_DOMAIN = 'http://localhost:8000';
 
             public function __construct() {
                 $this->id = 'apurata';
@@ -36,6 +37,7 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
                 $this->init_settings();
 
                 // Get settings, e.g.
+                $this->client_id = $this->get_option( 'client_id' );
                 // $this->title = $this->get_option( 'title' );
 
                 add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
@@ -56,7 +58,15 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
                         'type' => 'checkbox',
                         'label' => __('Habilitar Apurata', self::TEXT_DOMAIN),
                         'default' => 'yes'
-                    )
+                    ),
+                    'client_id' => array
+                    (
+                        'title' => __('ID de Cliente', self::TEXT_DOMAIN),
+                        'type' => 'text',
+                        'required' => true,
+                        'description' => __('Este ID se obtiene luego de comunicarte con nosotros', self::TEXT_DOMAIN),
+                        'default' => ''
+                    ),
                 );
             }
 
@@ -64,10 +74,32 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
                 global $woocommerce;
                 $order = new WC_Order( $order_id );
 
+                $redirect_url = self::APURATA_DOMAIN .
+                                 '/pos/crear-orden-y-continuar' .
+                                 '?order_id=' . $order->get_id() .
+                                 '&pos_client_id=' . $this->client_id.
+                                 '&amount=' . $order->get_total() .
+                                 '&url_redir_on_canceled=http://localhost:8080/?page_id=7' .
+                                 '&url_redir_on_rejected=http://localhost:8080/?page_id=7' .
+                                 '&url_redir_on_success=http://localhost:8080/?page_id=7' .
+                                 '&customer_data__email=' . $order->get_billing_email() .
+                                 '&customer_data__phone=' . $order->get_billing_phone() .
+                                 '&customer_data__billing_address_1=' . $order->get_billing_address_1() .
+                                 '&customer_data__billing_address_2=' . $order->get_billing_address_2() .
+                                 '&customer_data__billing_first_name=' . $order->get_billing_first_name() .
+                                 '&customer_data__billing_last_name=' . $order->get_billing_last_name() .
+                                 '&customer_data__billing_city=' . $order->get_billing_city() .
+                                 '&customer_data__shipping_address_1=' . $order->get_shipping_address_1() .
+                                 '&customer_data__shipping_address_2=' . $order->get_shipping_address_2() .
+                                 '&customer_data__shipping_first_name=' . $order->get_shipping_first_name() .
+                                 '&customer_data__shipping_last_name=' . $order->get_shipping_last_name() .
+                                 '&customer_data__shipping_city=' . $order->get_shipping_city() ;
+
+
                 // Return thankyou redirect
                 return array(
                     'result' => 'success',
-                    'redirect' => 'http://apurata.com'
+                    'redirect' => $redirect_url
                 );
             }
         }
