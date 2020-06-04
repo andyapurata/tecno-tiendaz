@@ -5,3 +5,6 @@
 # Docker compose volumes
 html/
 mysql/
+
+# Examples
+examples/
