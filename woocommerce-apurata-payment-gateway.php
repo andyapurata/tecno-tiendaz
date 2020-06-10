@@ -39,9 +39,26 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
 
                 // Get settings, e.g.
                 $this->client_id = $this->get_option( 'client_id' );
-                // $this->title = $this->get_option( 'title' );
+                $this->allow_http = $this->get_option( 'allow_http' );
 
                 add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
+                add_filter( 'woocommerce_available_payment_gateways', array( $this, 'hide_apurata_gateway' ) );
+            }
+
+            function hide_apurata_gateway( $gateways ) {
+                /* Hide Apurata gateway based on some conditions. */
+                $currency = get_woocommerce_currency();
+
+                if ($this->allow_http == "no" && $_SERVER['REQUEST_SCHEME'] != 'https') {
+                    error_log('Apurata solo soporta https');
+                    unset( $gateways['apurata'] );
+                }
+                if( $currency != 'PEN' ){
+                    //disable gateway paypal if currency is ABC
+                    error_log('Apurata sólo soporta currency=PEN. Currency actual=' . $currency);
+                    unset( $gateways['apurata'] );
+                }
+                return $gateways;
             }
 
 
@@ -54,12 +71,27 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
                         'label' => __('Habilitar Apurata', APURATA_TEXT_DOMAIN),
                         'default' => 'yes'
                     ),
+                    'allow_http' => array
+                    (
+                        'title' => __('Habilitar HTTP', APURATA_TEXT_DOMAIN),
+                        'type' => 'checkbox',
+                        'label' => __('Habilitar HTTP (no seguro)', APURATA_TEXT_DOMAIN),
+                        'default' => 'no'
+                    ),
                     'client_id' => array
                     (
                         'title' => __('ID de Cliente', APURATA_TEXT_DOMAIN),
                         'type' => 'text',
                         'required' => true,
                         'description' => __('Para obtener este ID comunícate con nosotros al correo merchants@apurata.com', APURATA_TEXT_DOMAIN),
+                        'default' => ''
+                    ),
+                    'Token' => array
+                    (
+                        'title' => __('Token Secreto', APURATA_TEXT_DOMAIN),
+                        'type' => 'text',
+                        'required' => true,
+                        'description' => __('Para obtener este Token comunícate con nosotros al correo merchants@apurata.com', APURATA_TEXT_DOMAIN),
                         'default' => ''
                     ),
                 );
@@ -110,7 +142,6 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
 
     /* BEGIN OF HOOKS */
     function on_new_event_from_apurata() {
-        // Still require validation
         global $woocommerce;
 
         $order_id = intval($_GET["order_id"]);
