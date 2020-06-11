@@ -14,8 +14,6 @@ services:
       WORDPRESS_DB_USER: exampleuser
       WORDPRESS_DB_PASSWORD: examplepass
       WORDPRESS_DB_NAME: exampledb
-    volumes:
-      - .:/var/www/html/wp-content/plugins/woocommerce-apurata-payment-gateway
 
   db:
     image: mysql:5.7
@@ -26,8 +24,7 @@ services:
       MYSQL_PASSWORD: examplepass
       MYSQL_RANDOM_ROOT_PASSWORD: '1'
     volumes:
-      - ./mysql:/var/lib/mysql
+      - wp_mysql:/var/lib/mysql
 
 volumes:
-  wordpress:
-  db:
+  wp_mysql:
