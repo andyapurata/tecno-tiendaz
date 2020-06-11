@@ -103,6 +103,7 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
             }
 
             function process_payment( $order_id ) {
+                global $APURATA_DOMAIN;
                 $order = wc_get_order( $order_id );
 
                 $redirect_url = $APURATA_DOMAIN .
