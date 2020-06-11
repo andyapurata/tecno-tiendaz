@@ -15,7 +15,11 @@
 
 defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
 const APURATA_TEXT_DOMAIN = 'woocommerce-apurata-payment-gateway';
-const APURATA_DOMAIN = 'http://localhost:8000';
+
+$APURATA_DOMAIN = getenv('APURATA_DOMAIN');
+if ($APURATA_DOMAIN == false) {
+    $APURATA_DOMAIN = 'https://apurata.com';
+}
 
 // Check if WooCommerce is active
 if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) {
@@ -101,7 +105,7 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
             function process_payment( $order_id ) {
                 $order = wc_get_order( $order_id );
 
-                $redirect_url = APURATA_DOMAIN .
+                $redirect_url = $APURATA_DOMAIN .
                                  '/pos/crear-orden-y-continuar' .
                                  '?order_id=' . urlencode($order->get_id()) .
                                  '&pos_client_id=' . urlencode($this->client_id) .
