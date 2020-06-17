@@ -57,7 +57,9 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
                 $this->secret_token = $this->get_option( 'secret_token' );
 
                 add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
+
                 add_filter( 'woocommerce_available_payment_gateways', array( $this, 'hide_apurata_gateway' ) );
+                add_action( 'woocommerce_api_on_new_event_from_apurata', array($this, 'on_new_event_from_apurata') );
             }
 
             function get_landing_confing() {
@@ -172,6 +174,35 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
                     'redirect' => $redirect_url
                 );
             }
+
+            /* BEGIN OF HOOKS */
+            function on_new_event_from_apurata() {
+                global $woocommerce;
+
+                $order_id = intval($_GET["order_id"]);
+                $event = $_GET["event"];
+
+                $order = wc_get_order( $order_id );
+
+                if (!$order) {
+                    error_log('Orden no encontrada: ' . $order_id);
+                    return;
+                }
+
+                if ($event == 'approved' && $order->get_status() == 'pending') {
+                    $order->update_status('on-hold', __( 'Esperando validación de identidad del comprador', APURATA_TEXT_DOMAIN ));
+                    $woocommerce->cart->empty_cart();
+                } else if ($event == 'validated') {
+                    $order->update_status('processing');
+                } else if ($event == 'rejected') {
+                    $order->update_status('failed');
+                } else if ($event == 'canceled') {
+                    $order->update_status('failed');
+                } else {
+                    error_log('Evento no soportado: ' . $event);
+                }
+            }
+            /* END OF HOOKS */
         }
     }
 
@@ -183,36 +214,5 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
     }
 
     add_filter( 'woocommerce_payment_gateways', 'add_wc_apurata_payment_gateway' );
-
-    /* BEGIN OF HOOKS */
-    function on_new_event_from_apurata() {
-        global $woocommerce;
-
-        $order_id = intval($_GET["order_id"]);
-        $event = $_GET["event"];
-
-        $order = wc_get_order( $order_id );
-
-        if (!$order) {
-            error_log('Orden no encontrada: ' . $order_id);
-            return;
-        }
-
-        if ($event == 'approved' && $order->get_status() == 'pending') {
-            $order->update_status('on-hold', __( 'Esperando validación de identidad del comprador', APURATA_TEXT_DOMAIN ));
-            $woocommerce->cart->empty_cart();
-        } else if ($event == 'validated') {
-            $order->update_status('processing');
-        } else if ($event == 'rejected') {
-            $order->update_status('failed');
-        } else if ($event == 'canceled') {
-            $order->update_status('failed');
-        } else {
-            error_log('Evento no soportado: ' . $event);
-        }
-    }
-
-    add_action( 'woocommerce_api_on_new_event_from_apurata', 'on_new_event_from_apurata' );
-    /* END OF HOOKS */
 }
 ?>
