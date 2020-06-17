@@ -189,6 +189,22 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
                     return;
                 }
 
+                // Check Authorization
+                $auth = getallheaders()['Authorization'];
+                if (!$auth) {
+                    error_log('Missing authorization header');
+                    return;
+                }
+                list($auth_type, $token) = explode(' ', $auth);
+                if (strtolower($auth_type) != 'bearer'){
+                    error_log('Invalid authorization type');
+                    return;
+                }
+                if ($token != $this->secret_token) {
+                    error_log('Invalid authorization token');
+                    return;
+                }
+
                 if ($event == 'approved' && $order->get_status() == 'pending') {
                     $order->update_status('on-hold', __( 'Esperando validación de identidad del comprador', APURATA_TEXT_DOMAIN ));
                     $woocommerce->cart->empty_cart();
