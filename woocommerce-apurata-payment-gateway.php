@@ -31,7 +31,7 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
                 $this->id = 'apurata';
 
                 $this->title = __('Apurata - Cuotas quincenales', APURATA_TEXT_DOMAIN);
-                $this->description = '<img width="100%" src="https://static.apurata.com/img/steps-explanation.png"/>';
+                $this->description = '<img style="max-width: 450px" width="100%" src="https://static.apurata.com/img/steps-explanation.png"/>';
                 $this->icon = 'https://static.apurata.com/img/logo-dark.svg';
                 $this->has_fields = FALSE;
 
