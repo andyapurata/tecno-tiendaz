@@ -16,9 +16,18 @@
 defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
 const APURATA_TEXT_DOMAIN = 'woocommerce-apurata-payment-gateway';
 
+// Domain to use in browser
 $APURATA_DOMAIN = getenv('APURATA_DOMAIN');
+// Domain to use in API calls.
+// In docker, there is a special IP for the host network.
+// We use this IP to access the local apurata server from inside the container.
+$APURATA_API_DOMAIN = getenv('APURATA_API_DOMAIN');
+
 if ($APURATA_DOMAIN == false) {
     $APURATA_DOMAIN = 'https://apurata.com';
+}
+if ($APURATA_API_DOMAIN == false) {
+    $APURATA_API_DOMAIN = $APURATA_DOMAIN;
 }
 
 // Check if WooCommerce is active
@@ -45,9 +54,31 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
                 // Get settings, e.g.
                 $this->client_id = $this->get_option( 'client_id' );
                 $this->allow_http = $this->get_option( 'allow_http' );
+                $this->secret_token = $this->get_option( 'secret_token' );
 
                 add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
                 add_filter( 'woocommerce_available_payment_gateways', array( $this, 'hide_apurata_gateway' ) );
+            }
+
+            function get_landing_confing() {
+                if (!$this->landing_config) {
+                    $ch = curl_init();
+
+                    global $APURATA_API_DOMAIN;
+                    $url = $APURATA_API_DOMAIN .
+                             '/pos/client/landing_config';
+                    curl_setopt($ch, CURLOPT_URL, $url);
+
+                    $headers = array("Authorization: Bearer " . $this->secret_token);
+                    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+                    // $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                    $landing_config = curl_exec($ch);
+                    $landing_config = json_decode($landing_config);
+                    curl_close($ch);
+                    $this->landing_config = $landing_config;
+                }
+                return $this->landing_config;
             }
 
             function hide_apurata_gateway( $gateways ) {
@@ -63,6 +94,13 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
                     error_log('Apurata sólo soporta currency=PEN. Currency actual=' . $currency);
                     unset( $gateways['apurata'] );
                 }
+
+                $landing_config = $this->get_landing_confing();
+                if ($landing_config->min_amount > WC()->cart->total || $landing_config->max_amount < WC()->cart->total) {
+                    error_log('Apurata no financia el monto del carrito: ' . WC()->cart->total);
+                    unset( $gateways['apurata'] );
+                }
+
                 return $gateways;
             }
 
@@ -91,7 +129,7 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
                         'description' => __('Para obtener este ID comunícate con nosotros al correo merchants@apurata.com', APURATA_TEXT_DOMAIN),
                         'default' => ''
                     ),
-                    'Token' => array
+                    'secret_token' => array
                     (
                         'title' => __('Token Secreto', APURATA_TEXT_DOMAIN),
                         'type' => 'text',
