@@ -206,14 +206,14 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
                 }
 
                 if ($event == 'approved' && $order->get_status() == 'pending') {
-                    $order->update_status('on-hold', __( 'Esperando validación de identidad del comprador', APURATA_TEXT_DOMAIN ));
+                    $order->update_status('on-hold', __( 'Apurata aprobó la orden, esperando validación de identidad', APURATA_TEXT_DOMAIN ));
                     $woocommerce->cart->empty_cart();
                 } else if ($event == 'validated') {
-                    $order->update_status('processing');
+                    $order->update_status('processing', __( 'Apurata validó identidad', APURATA_TEXT_DOMAIN ));
                 } else if ($event == 'rejected') {
-                    $order->update_status('failed');
+                    $order->update_status('failed', __( 'Apurata rechazó la orden', APURATA_TEXT_DOMAIN ));
                 } else if ($event == 'canceled') {
-                    $order->update_status('failed');
+                    $order->update_status('failed', __( 'El financiamiento en Apurata fue cancelado', APURATA_TEXT_DOMAIN ));
                 } else {
                     error_log('Evento no soportado: ' . $event);
                 }
