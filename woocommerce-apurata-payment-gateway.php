@@ -62,7 +62,7 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
                 add_action( 'woocommerce_api_on_new_event_from_apurata', array($this, 'on_new_event_from_apurata') );
             }
 
-            function get_landing_confing() {
+            function get_landing_config() {
                 if (!$this->landing_config) {
                     $ch = curl_init();
 
@@ -97,7 +97,7 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
                     unset( $gateways['apurata'] );
                 }
 
-                $landing_config = $this->get_landing_confing();
+                $landing_config = $this->get_landing_config();
                 if ($landing_config->min_amount > WC()->cart->total || $landing_config->max_amount < WC()->cart->total) {
                     error_log('Apurata no financia el monto del carrito: ' . WC()->cart->total);
                     unset( $gateways['apurata'] );
