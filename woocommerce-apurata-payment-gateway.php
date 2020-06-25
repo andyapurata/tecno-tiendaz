@@ -39,14 +39,14 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
             public function __construct() {
                 $this->id = 'apurata';
 
-                $this->title = __('Apurata - Cuotas quincenales', APURATA_TEXT_DOMAIN);
+                $this->title = __('Cuotas sin tarjeta de crédito', APURATA_TEXT_DOMAIN);
                 $this->description = '<img style="max-width: 450px" width="100%" src="https://static.apurata.com/img/pos/steps-explanation_v2.png"/>';
                 $this->icon = 'https://static.apurata.com/img/logo-dark.svg';
                 $this->has_fields = FALSE;
 
                 // Shown in the admin panel:
                 $this->method_title = 'Apurata';
-                $this->method_description = __('Evalúa a tus clientes y financia su compra con cuotas quincenales', APURATA_TEXT_DOMAIN);
+                $this->method_description = __('Evalúa a tus clientes y financia su compra con cuotas quincenales, sin tarjeta de crédito', APURATA_TEXT_DOMAIN);
 
                 $this->init_form_fields();
                 $this->init_settings();
