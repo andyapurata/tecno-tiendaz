@@ -40,7 +40,7 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
                 $this->id = 'apurata';
 
                 $this->title = __('Cuotas sin tarjeta de crédito', APURATA_TEXT_DOMAIN);
-                $this->description = '<img style="max-width: 450px" width="100%" src="https://static.apurata.com/img/pos/steps-explanation_v2.png"/>';
+                $this->description = '<img style="max-width: 450px;height: auto;max-height: initial;" width="100%" src="https://static.apurata.com/img/pos/steps-explanation_v2.png"/>';
                 $this->icon = 'https://static.apurata.com/img/logo-dark.svg';
                 $this->has_fields = FALSE;
 
