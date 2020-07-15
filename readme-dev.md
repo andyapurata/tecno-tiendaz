@@ -16,6 +16,15 @@ Just run:
 	# Then stop the script, and from now on, run:
 	./run_dev.sh
 
+# FEATURE LIST
+
+* By default work with https only. You have to manually allow for http
+* Validate requests with secret token
+* Hide Apurata payment button in the following cases:
+	* HTTPS not being used, and HTTP not manually enabled
+	* Currency != PEN
+	* Amount not in the right range
+* Autocomplete Apurata funnel with order details as name, email, phone
 
 # PROBLEM WITH VOLUMES
 
