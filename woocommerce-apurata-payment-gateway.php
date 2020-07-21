@@ -40,7 +40,20 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
                 $this->id = 'apurata';
 
                 $this->title = __('Cuotas sin tarjeta de crédito - Apurata', APURATA_TEXT_DOMAIN);
-                $this->description = '<img style="max-width: 450px;height: auto;max-height: initial;float: initial;" width="100%" src="https://static.apurata.com/img/pos/steps-explanation_v2.png"/>';
+                $this->description = <<<EOF
+                    <div id="apurata-pos-steps"></div>
+                    <script>
+                        var r = new XMLHttpRequest();
+                        r.open("GET", "https://apurata.com/pos/info-steps", true);
+                        r.onreadystatechange = function () {
+                          if (r.readyState != 4 || r.status != 200) return;
+                          var elem = document.getElementById("apurata-pos-steps");
+                          elem.innerHTML = r.responseText;
+                        };
+                        r.send();
+                    </script>
+                EOF;
+
                 $this->icon = 'https://static.apurata.com/img/logo-dark.svg';
                 $this->has_fields = FALSE;
 

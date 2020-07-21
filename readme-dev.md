@@ -15,6 +15,7 @@ Just run:
 
 	# Then stop the script, and from now on, run:
 	./run_dev.sh
+	# Go to http://localhost:8080/
 
 # FEATURE LIST
 
