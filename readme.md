@@ -1,21 +1,21 @@
+# Get woocommerce
+
+	WOOCOMMERCE_VERSION=4.2.0
+	mkdir -p plugins
+	wget https://downloads.wordpress.org/plugin/woocommerce.${WOOCOMMERCE_VERSION}.zip -O /tmp/temp.zip \
+		&& unzip -q /tmp/temp.zip -d ./plugins/ \
+		&& rm /tmp/temp.zip
+
 # Run in prd
 
-Just run:
-
-	git pull
-	docker-compose build
 	docker-compose up -d
 	# Go to: http://woocommerce-demo-1515033668.us-west-2.elb.amazonaws.com/
 
 # Run in dev
 
-	# Run the following just the first time, see "PROBLEM WITH VOLUMES"
-	docker-compose build
-	docker-compose up
-
-	# Then stop the script, and from now on, run:
 	./run_dev.sh
 	# Go to http://localhost:8080/
+
 
 # FEATURE LIST
 
@@ -26,11 +26,6 @@ Just run:
 	* Currency != PEN
 	* Amount not in the right range
 * Autocomplete Apurata funnel with order details as name, email, phone
-
-# ABOUT VERSION
-
-The version is set in a git tag. From there, it is copied to the php script file on the build
-process.
 
 # PROBLEM WITH VOLUMES
 

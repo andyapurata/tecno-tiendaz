@@ -3,11 +3,12 @@
 *.sublime-workspace
 
 # Releases
-v*.zip
+*.zip
 
 # Docker compose volumes
 html/
 mysql/
+plugins/
 woocommerce-apurata-payment-gateway/
 
 # Examples
