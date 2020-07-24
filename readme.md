@@ -27,6 +27,11 @@ Just run:
 	* Amount not in the right range
 * Autocomplete Apurata funnel with order details as name, email, phone
 
+# ABOUT VERSION
+
+The version is set in a git tag. From there, it is copied to the php script file on the build
+process.
+
 # PROBLEM WITH VOLUMES
 
 Lo que sucede es /var/www/data es un volúmen. Y la primera vez que se corre el
