@@ -1,16 +1,20 @@
 <?php
 /**
  * Plugin Name:       WooCommerce Apurata Payment Gateway
- * Plugin URI:        https://app.apurata.com/
+ * Plugin URI:        https://github.com/quique0194/woocommerce-apurata-payment-gateway
  * Description:       Finance your purchases with a quick Apurata loan.
  * Version:           0.0.1
+ * Tested up to:      4.2.0
  * Requires at least: 5.2
  * Requires PHP:      7.2
- * Author:            Jose Carrillo
- * Author URI:        https://www.linkedin.com/in/jose-enrique-carrillo-pino-40b09877
+ * Author:            Apurata
+ * Author URI:        https://app.apurata.com/
  * License:           GPL3
  * License URI:       https://www.gnu.org/licenses/gpl-3.0.html
  * Text Domain:       woocommerce-apurata-payment-gateway
+ *
+ * WC requires at least: 4.2.0
+ * WC tested up to: 4.2.0
 */
 
 defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
