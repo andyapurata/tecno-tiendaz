@@ -73,10 +73,60 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
                 $this->allow_http = $this->get_option( 'allow_http' );
                 $this->secret_token = $this->get_option( 'secret_token' );
 
+                $this->gen_pay_with_apurata_html();
+
                 add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
 
                 add_filter( 'woocommerce_available_payment_gateways', array( $this, 'hide_apurata_gateway' ) );
                 add_action( 'woocommerce_api_on_new_event_from_apurata', array($this, 'on_new_event_from_apurata') );
+            }
+
+            function gen_pay_with_apurata_html() {
+                if ($this->pay_with_apurata_addon) {
+                    return;
+                }
+
+                $ch = curl_init();
+
+                global $APURATA_API_DOMAIN;
+                $url = $APURATA_API_DOMAIN .
+                         '/pos/pay-with-apurata-add-on/' . WC()->cart->total;
+                curl_setopt($ch, CURLOPT_URL, $url);
+
+                $headers = array("Authorization: Bearer " . $this->secret_token);
+                curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                $this->pay_with_apurata_addon = curl_exec($ch);
+                $resp_code = curl_getinfo($ch , CURLINFO_HTTP_CODE);
+                curl_close($ch);
+                if ($resp_code == 200) {
+                    $this->pay_with_apurata_addon = str_replace(array("\r", "\n"), '', $this->pay_with_apurata_addon);
+                    $this->pay_with_apurata_addon = addslashes($this->pay_with_apurata_addon);
+                } else {
+                    error_log("Apurata responded with code ". $resp_code);
+                    $this->pay_with_apurata_addon = '';
+                }
+                echo(sprintf("<script>window.PAY_WITH_APURATA_ADDON_HTML = '%s';</script>", $this->pay_with_apurata_addon));
+                $this->insert_pay_with_apurata_html();
+            }
+
+            function insert_pay_with_apurata_html() {
+                echo(<<<EOF
+                    <!-- Agregar al carro: "Págalo en cuotas con Apurata" -->
+                    <script>
+                    document.addEventListener("DOMContentLoaded", function(){
+                        var apurata_div = document.createElement('div');
+                        apurata_div.setAttribute("id", "pay-with-apurata");
+                        apurata_div.innerHTML = window.PAY_WITH_APURATA_ADDON_HTML;
+
+                        var ct = document.getElementsByClassName("cart_totals")[0];
+                        var st = ct.getElementsByClassName('shop_table')[0];
+                        st.parentNode.insertBefore(apurata_div, st.nextSibling);
+                    });
+                    </script>
+                    <!-- Fin de Agregar al carro: "Págalo en cuotas con Apurata" -->
+                EOF);
             }
 
             function get_landing_config() {
