@@ -6,6 +6,10 @@
 		&& unzip -q /tmp/temp.zip -d ./plugins/ \
 		&& rm /tmp/temp.zip
 
+# Get woocommerce-apurata
+
+	(cd plugins; git clone git@github.com:apurata/woocommerce-apurata-payment-gateway.git)
+
 # Run in prd
 
 	docker-compose up -d
