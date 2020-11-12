@@ -3,7 +3,8 @@ version: '3.1'
 services:
 
   wordpress:
-    build: php7.0/
+    # build: php7.0/
+    image: wordpress:5.5.1-php7.2-apache
     restart: always
     ports:
       - 8080:80
@@ -16,6 +17,7 @@ services:
       WORDPRESS_DB_NAME: exampledb
     volumes:
       - ./plugins:/var/www/html/wp-content/plugins
+      - wp_content:/var/www/html/wp-content
 
   db:
     image: mysql:5.7
@@ -30,3 +32,4 @@ services:
 
 volumes:
   wp_mysql:
+  wp_content:
